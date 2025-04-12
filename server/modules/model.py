@@ -67,7 +67,14 @@ def run_autoencoder_fraud_detection():
     fraud_cases = df[df["predicted_fraud"] == 1]
 
     fraud_cases.to_csv(output_path, index=False)
-    print(f"✅ Saved {len(fraud_cases)} predicted frauds to '{output_path}'")
+
+    # Log stats
+    total = len(df)
+    frauds = len(fraud_cases)
+    print(f"📈 Total records evaluated: {total}")
+    print(f"🚨 Predicted frauds: {frauds}")
+    print(f"📊 Fraud percentage: {(frauds / total) * 100:.2f}%")
+    print(f"✅ Saved {frauds} predicted frauds to '{output_path}'")
 
 if __name__ == "__main__":
     run_autoencoder_fraud_detection()
