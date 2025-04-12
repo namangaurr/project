@@ -25,7 +25,7 @@ source .venv/bin/activate
 ### 3. Install Dependencies
 
 ```bash
-pip install faker pandas numpy kafka-python pyspark fastapi uvicorn python-dotenv polars scikit-learn matplotlib joblib tensorflow pydantic streamlit
+pip install faker pandas numpy kafka-python pyspark fastapi uvicorn python-dotenv polars scikit-learn matplotlib joblib tensorflow pydantic streamlit google-generativeai
 ```
 
 ---
@@ -110,6 +110,7 @@ Example Output:
 EMAIL_USER=your_email@gmail.com
 EMAIL_PASS=your_16_character_app_password
 TO_EMAIL=recipient_email@gmail.com
+GEMINI_API_KEY=your_gemini_key
 ```
 
 To generate the app password:
@@ -117,6 +118,14 @@ To generate the app password:
 1. Go to https://myaccount.google.com/apppasswords  
 2. Select **Mail** and **Other (e.g., "Streamlit Drift")**  
 3. Copy the 16-character password and paste it into `.env`
+
+To generate free gemini key:
+
+1. Go to https://aistudio.google.com/apikey
+2. Select **Create API Key**
+3. Select a project from your existing Google Cloud projects 
+4. Click **Create API Key in existing project**
+5. Copy the key and paste it into `.env`
 
 ---
 
