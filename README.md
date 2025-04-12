@@ -104,7 +104,7 @@ Example Output:
 
 ## 📬 Configure Email Alerts
 
-### 8. Update `.env` File in `modules/` Folder
+### 8. Create `.env` File in `modules/` Folder
 
 ```env
 EMAIL_USER=your_email@gmail.com
