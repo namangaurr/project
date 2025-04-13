@@ -16,6 +16,7 @@ from faker import Faker
 import threading
 import polars as pl
 import random
+from modules.train_autoencoder import train_autoencoder  # <-- Import retraining function
 
 st.set_page_config(page_title="Drift Monitor", layout="wide")
 
@@ -34,8 +35,10 @@ HISTORY_LOG = BASE_DIR / "modules/monitoring_history.json"
 TEMP_DATA_PATH = BASE_DIR / "modules/tmp_monitor_data.csv"
 ENRICHED_DATA_PATH = BASE_DIR / "modules/denoised_enriched_transactions.csv"
 
-DRIFT_THRESHOLD = 0.4
-AUTO_RUN_INTERVAL = 60  # seconds
+DRIFT_THRESHOLD = 0.1
+EMAIL_ALERT_THRESHOLD = 0.05
+AUTO_RUN_INTERVAL = 30  # seconds
+RETRAIN_WAIT_TIME = 120  # 3 minutes in seconds
 
 # ----------- Generate Realistic Synthetic Data  -----------
 def generate_data(num_customers=10, accounts_per_customer=10, num_transactions=1000, anomaly_prob=0.05):
@@ -331,9 +334,6 @@ df = generate_data()
 df, fraud_ratio = complete_fraud_pipeline(df)
 append_to_history_log(fraud_ratio)
 
-if fraud_ratio > DRIFT_THRESHOLD:
-    send_alert_email(fraud_ratio)
-
 st.session_state.history.append({
     "timestamp": datetime.now().isoformat(),
     "fraud_ratio": fraud_ratio
@@ -346,6 +346,20 @@ ratios = [entry["fraud_ratio"] for entry in st.session_state.history]
 st.line_chart(pd.DataFrame({"Drift Ratio": ratios}, index=pd.to_datetime(timestamps)))
 st.info(f"🔁 Last run at {timestamps[-1]} — Drift: {ratios[-1]:.2%}")
 
-# Refresh every 15s
-time.sleep(15)
+# Send alerts & retrain if needed
+if fraud_ratio > EMAIL_ALERT_THRESHOLD:
+    send_alert_email(fraud_ratio)
+    st.warning(f"📧 Alert: Fraud ratio reached {fraud_ratio:.2%}. Email notification has been sent.")
+
+if fraud_ratio > DRIFT_THRESHOLD:
+    send_alert_email(fraud_ratio)
+    st.warning("🚨 Drift threshold exceeded. Automatic model retraining triggered.")
+    with st.status("🛠️ Retraining model... Please wait 3 minutes", expanded=True):
+        train_autoencoder()
+        st.write("✅ Retraining complete. Cooling down...")
+        st.write(f"⏳ Waiting {RETRAIN_WAIT_TIME // 60} minutes before next run...")
+        time.sleep(RETRAIN_WAIT_TIME)
+
+# Refresh every 60s
+time.sleep(AUTO_RUN_INTERVAL)
 st.rerun()
