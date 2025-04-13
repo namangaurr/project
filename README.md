@@ -10,7 +10,7 @@ This project simulates a real-time fraud detection pipeline using synthetic data
 
 ```bash
 cd Desktop
-git clone https://github.com/pragatimehra/project.git
+git clone https://github.com/namangaurr/project.git
 cd project
 code .
 ```
