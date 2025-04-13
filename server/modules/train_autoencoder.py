@@ -17,7 +17,7 @@ from tensorflow.keras.models import load_model
 
 # Define project paths
 BASE_DIR = Path(__file__).resolve().parent.parent
-DATA_PATH = Path("/Users/pragatimehra/Desktop/project/server/modules/non_fraud_transactions.csv")
+DATA_PATH = Path("/Users/namangaur/Desktop/project/server/modules/non_fraud_transactions.csv")
 PREPROCESSOR_PATH = BASE_DIR / "modules/fraud_preprocessor.pkl"
 MODEL_PATH = BASE_DIR / "modules/fraud_autoencoder_model.keras"
 THRESHOLD_PATH = BASE_DIR / "modules/fraud_threshold.txt"
