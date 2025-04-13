@@ -177,6 +177,15 @@ async def submit_system_feedback(feedback: FeedbackCreate):
     })
     return {"success": True, "message": "System feedback submitted successfully"}
 
+@app.get("/api/monitoring")
+async def get_monitoring_data():
+    try:
+        with open("modules/monitoring_history.json", "r") as f:
+            return json.load(f)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # ------------------------ Run the Server ------------------------
 
 if __name__ == "__main__":

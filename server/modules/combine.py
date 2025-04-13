@@ -1,5 +1,6 @@
 from pyspark.sql import SparkSession
 import os
+import shutil
 
 def merge_parquet_to_csv() -> str:
     spark = SparkSession.builder.appName("CombineParquetData").getOrCreate()
@@ -27,31 +28,21 @@ def merge_parquet_to_csv() -> str:
         "is_fraud", "fraud_reasons"
     ]
 
-    df_new = df_joined.select(*final_columns)
-    df_new= df_new.dropDuplicates(["transaction_id"])
-    print(df_new.count())
+    df_new = df_joined.select(*final_columns).dropDuplicates(["transaction_id"])
+
     output_dir = "modules/denormalized_transactions"
-    output_file = os.path.join(output_dir, "denormalized_transactions.csv")
 
-    if os.path.exists(output_file):
-        print(f"📁 Existing file found. Deduplicating based on 'transaction_id'.")
+    # 💣 Clear old data if exists
+    if os.path.exists(output_dir):
+        print(f"🧹 Clearing old output directory: {output_dir}")
+        shutil.rmtree(output_dir)
 
-        # Read existing CSV with Spark
-        df_existing = spark.read.option("header", "true").csv(output_file)
+    os.makedirs(output_dir, exist_ok=True)
 
-        # Ensure types match (if needed)
-        df_existing = df_existing.select(*df_new.columns)
-
-        # Combine and deduplicate
-        df_combined = df_existing.unionByName(df_new).dropDuplicates(["transaction_id"])
-    else:
-        print(f"📁 No existing file found. Creating new dataset.")
-        os.makedirs(output_dir, exist_ok=True)
-        df_combined = df_new
-
-    # Write final deduplicated CSV
-    df_combined.coalesce(1).write.option("header", "true").mode("overwrite").csv(output_dir)
-    print(f"✅ Deduplicated dataset saved to '{output_dir}'.")
+    # ✅ Save fresh deduplicated data
+    df_new.coalesce(1).write.option("header", "true").mode("overwrite").csv(output_dir)
+    print(f"✅ New deduplicated dataset saved to '{output_dir}'.")
+    
     spark.stop()
     return output_dir
 
