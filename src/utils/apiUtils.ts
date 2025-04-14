@@ -1,7 +1,7 @@
 
 // API utilities for connecting to FastAPI backend
 
-const API_URL = "http://localhost:8000/api";
+const API_URL = "http://localhost:8001/api";
 
 // Mock data for when the backend isn't available
 const MOCK_TRANSACTIONS = [
