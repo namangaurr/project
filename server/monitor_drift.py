@@ -17,6 +17,9 @@ import threading
 import polars as pl
 import random
 from modules.train_autoencoder import train_autoencoder  # <-- Import retraining function
+import warnings
+warnings.filterwarnings("ignore", category=RuntimeWarning)
+
 
 st.set_page_config(page_title="Drift Monitor", layout="wide")
 
@@ -331,7 +334,41 @@ if "history" not in st.session_state:
     st.session_state.history = []
 
 df = generate_data()
+
+REFERENCE_PATH = BASE_DIR / "modules/non_fraud_transactions_reference.csv"
+
+# Save reference once if it doesn't exist
+if not REFERENCE_PATH.exists():
+    df.to_csv(REFERENCE_PATH, index=False)
+    print("✅ Reference dataset saved for drift comparison.")
+
 df, fraud_ratio = complete_fraud_pipeline(df)
+
+# --- Run Evidently Data Drift Report ---
+from evidently.report import Report
+from evidently.metric_preset import DataDriftPreset
+
+reference_df = pd.read_csv(REFERENCE_PATH)
+current_df = df.copy()
+
+report = Report(metrics=[DataDriftPreset()])
+report.run(reference_data=reference_df, current_data=current_df)
+
+EVIDENTLY_REPORT_PATH = BASE_DIR / "modules/evidently_drift_report.html"
+report.save_html(str(EVIDENTLY_REPORT_PATH))
+print(f"📊 Evidently report saved: {EVIDENTLY_REPORT_PATH}")
+st.success(f"📄 [View Evidently Drift Report](modules/evidently_drift_report.html)")
+
+# ✅ Now it's safe to use the result
+result_dict = report.as_dict()
+evidently_drift_detected = result_dict["metrics"][0]["result"]["dataset_drift"]
+st.write(f"📊 Evidently Drift Detected: {evidently_drift_detected}")
+
+# Optional: retrain based on Evidently drift
+if evidently_drift_detected and fraud_ratio > DRIFT_THRESHOLD:
+    st.warning("🚨 Evidently & Fraud thresholds exceeded. Retraining model.")
+    train_autoencoder()
+
 append_to_history_log(fraud_ratio)
 
 st.session_state.history.append({
@@ -345,6 +382,17 @@ timestamps = [entry["timestamp"] for entry in st.session_state.history]
 ratios = [entry["fraud_ratio"] for entry in st.session_state.history]
 st.line_chart(pd.DataFrame({"Drift Ratio": ratios}, index=pd.to_datetime(timestamps)))
 st.info(f"🔁 Last run at {timestamps[-1]} — Drift: {ratios[-1]:.2%}")
+
+import streamlit.components.v1 as components
+EVIDENTLY_REPORT_PATH = BASE_DIR / "modules/evidently_drift_report.html"
+
+if EVIDENTLY_REPORT_PATH.exists():
+    with open(EVIDENTLY_REPORT_PATH, "r") as f:
+        html = f.read()
+    st.subheader("📊 Evidently Data Drift Report")
+    components.html(html, height=800, scrolling=True)
+else:
+    st.warning("❗ Evidently report not found yet.")
 
 # Send alerts & retrain if needed
 if fraud_ratio > EMAIL_ALERT_THRESHOLD:
