@@ -4,6 +4,18 @@ This project simulates a real-time fraud detection pipeline using synthetic data
 
 ---
 
+# Reference Screenshots
+
+## Dashboard
+<img width="1440" alt="Screenshot 2025-04-18 at 11 41 04 AM" src="https://github.com/user-attachments/assets/98f808f9-0fdb-4cc9-b5e5-dc2fabcbfb55" />
+
+## Drift Monitoring
+<img width="1440" alt="Screenshot 2025-04-18 at 11 40 08 AM" src="https://github.com/user-attachments/assets/074a7535-022e-4bfc-839a-48b80f9fe704" />
+
+## Evidently
+<img width="1440" alt="Screenshot 2025-04-18 at 11 40 50 AM" src="https://github.com/user-attachments/assets/ddea60d0-0ed5-4740-83f3-09af2f0d3c0c" />
+
+
 ## 📁 Project Setup
 
 ### 1. Clone the Repository
