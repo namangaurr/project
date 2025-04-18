@@ -39,9 +39,9 @@ TEMP_DATA_PATH = BASE_DIR / "modules/tmp_monitor_data.csv"
 ENRICHED_DATA_PATH = BASE_DIR / "modules/denoised_enriched_transactions.csv"
 
 DRIFT_THRESHOLD = 0.1
-EMAIL_ALERT_THRESHOLD = 0.05
+EMAIL_ALERT_THRESHOLD = 0.1
 AUTO_RUN_INTERVAL = 30  # seconds
-RETRAIN_WAIT_TIME = 120  # 3 minutes in seconds
+RETRAIN_WAIT_TIME = 120  # 2 minutes in seconds
 
 # ----------- Generate Realistic Synthetic Data  -----------
 def generate_data(num_customers=10, accounts_per_customer=10, num_transactions=1000, anomaly_prob=0.05):
