@@ -25,7 +25,7 @@ source .venv/bin/activate
 ### 3. Install Dependencies
 
 ```bash
-pip install faker pandas numpy kafka-python pyspark fastapi uvicorn python-dotenv polars scikit-learn matplotlib joblib tensorflow pydantic streamlit google-generativeai
+pip install faker pandas numpy kafka-python pyspark fastapi uvicorn python-dotenv polars scikit-learn matplotlib joblib tensorflow pydantic streamlit google-generativeai evidently
 ```
 
 ---
@@ -102,9 +102,9 @@ Example Output:
 
 ---
 
-## 📬 Configure Email Alerts
+## 📬 Configure Email Alerts and Gemini Key
 
-### 8. Create `.env` File in `modules/` Folder
+### 8. Create `.env` File in `server/` Folder
 
 ```env
 EMAIL_USER=your_email@gmail.com
@@ -118,6 +118,12 @@ To generate the app password:
 1. Go to https://myaccount.google.com/apppasswords  
 2. Select **Mail** and **Other (e.g., "Streamlit Drift")**  
 3. Copy the 16-character password and paste it into `.env`
+
+### 9. Create `.env` File in `modules/` Folder
+
+```env
+GEMINI_API_KEY=your_gemini_key
+```
 
 To generate free gemini key:
 
@@ -162,6 +168,24 @@ Features:
 | `fraud_autoencoder_model.h5` | Trained anomaly detection model        |
 | `fraud_preprocessor.pkl`     | Preprocessing pipeline                 |
 | `fraud_threshold.txt`        | Threshold used for fraud scoring       |
+
+---
+
+## 🎁 Bonus: Reset Kafka Topics (Start Fresh)
+To avoid appending records and ensure a clean start, you can delete existing Kafka topics:
+
+### 1. List All Kafka Topics
+```bash
+cd server
+python3 kafka_list.py
+```
+This script will display all the current Kafka topics.
+
+### 2. Delete All Kafka Topics
+```bash
+python3 kafka_dlt_topics.py
+```
+This will delete all listed Kafka topics, allowing you to restart your pipeline from a clean slate.
 
 ---
 
